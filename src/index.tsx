@@ -7,4 +7,4 @@ const rootElement = document.createElement('div')
 
 document.body.appendChild(rootElement)
 
-render(<Application />, rootElement)
+render(<Application />, rootElement);
