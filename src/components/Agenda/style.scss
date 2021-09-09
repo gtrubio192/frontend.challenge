@@ -32,3 +32,8 @@
   @include title-text;
   color: $blackColor;
 }
+
+.error {
+  @include title-text;
+  color: $redErrorColor;
+}

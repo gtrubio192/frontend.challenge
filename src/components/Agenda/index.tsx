@@ -49,9 +49,20 @@ const Agenda = (): ReactElement => {
         </div>
 
         <List>
-          {events.map(({ calendar, event }) => (
-            <EventCell key={event.id} calendar={calendar} event={event} />
-          ))}
+          {/* {
+            events.map(({ calendar, event }) => (
+              <EventCell key={event.id} calendar={calendar} event={event} />
+            ))
+          } */}
+          {
+            account.errorMessage
+            ? <div className={style.error}>
+                <span className={style.title}>Whoops! Problem refreshing your account</span>
+              </div>
+            : events.map(({ calendar, event }) => (
+                <EventCell key={event.id} calendar={calendar} event={event} />
+              ))
+          }
         </List>
       </div>
     </div>

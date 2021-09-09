@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import Account from 'src/models/Account'
+import Calendar from 'src/models/Calendar'
 import createAccount from 'lib/createAccount'
 
 import getUpdatedAccount from './getUpdatedAccount'
@@ -9,9 +10,22 @@ const initialAccountValue = createAccount()
 
 const useAccount = (): [Account, () => Promise<void>] => {
   const [account, setAccount] = useState<Account>(initialAccountValue)
-  const refreshAccount = async () =>
-    setAccount(await getUpdatedAccount(account))
-
+  const refreshAccount = async () => {
+    try {
+      const res = await getUpdatedAccount(account)
+      setAccount(res)
+      console.log(res)
+      // setAccount(await getUpdatedAccount(account))
+    }
+    catch (error) {
+      setAccount({
+        calendars: account.calendars,
+        errorMessage: error.message
+      })
+      console.log('Error getting new data')
+    }
+  }
+  
   return [account, refreshAccount]
 }
 
