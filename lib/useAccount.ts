@@ -4,6 +4,7 @@ import createAccount from 'lib/createAccount'
 import getUpdatedAccount from './getUpdatedAccount'
 
 const initialAccountValue = createAccount()
+
 /**
  * Bug fix: Handling promise errors
  */

@@ -35,7 +35,7 @@ const Agenda = (): ReactElement => {
 
   useEffect(() => {
     const cals = account.calendars.map((calendar) => calendar.id)
-    setCalendar(cals)
+    setCalendar(cals) 
   }, [account])
 
   useEffect(() => {
