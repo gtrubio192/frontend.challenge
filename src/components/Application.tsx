@@ -12,7 +12,9 @@ const Application = (): ReactElement => {
   const [account, refreshAccount] = useAccount()
 
   useEffect(
-    () => runEvery(REAL_TIME_UPDATES_INTERVAL, refreshAccount),
+    () => {
+      runEvery(REAL_TIME_UPDATES_INTERVAL, refreshAccount)
+    },
     [refreshAccount],
   )
 
