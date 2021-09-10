@@ -1,20 +1,16 @@
-import React, { ReactElement, useContext, useMemo, useState } from 'react'
+import React, { ReactElement, useContext, useMemo, useState, useEffect } from 'react'
 import { DateTime } from 'luxon'
-
 import greeting from 'lib/greeting'
-
 import Calendar from 'src/models/Calendar'
 import Event from 'src/models/Event'
 import AccountContext from 'src/context/accountContext'
-
 import List from './List'
 import EventCell from './EventCell'
 import runEvery from 'lib/runEvery'
 import useHour from 'lib/useHour'
-
 import style from './style.scss'
 
-const HOUR_INTERVAL = 3600000
+const FIVE_MIN_INTERVAL = 300000
 
 type AgendaItem = {
   calendar: Calendar
@@ -33,8 +29,24 @@ const compareByDateTime = (a: AgendaItem, b: AgendaItem) =>
 const Agenda = (): ReactElement => {
   const account = useContext(AccountContext)
   const [hour, setHour] = useHour()
+  const [calendars, setCalendar] = useState([])
+  const [dropdownFilter, setDropdownFilter] = useState<string | null>(null)
+  const [filteredEvents, setFilteredEvents] = useState<AgendaItem[]>()
 
-  runEvery(HOUR_INTERVAL, setHour)
+  useEffect(() => {
+    const cals = account.calendars.map((calendar) => calendar.id)
+    setCalendar(cals)
+  }, [account])
+
+  useEffect(() => {
+    if(dropdownFilter === '' || dropdownFilter === null) {
+      setFilteredEvents(events)
+    }
+    else {
+      const filterCalendar = events.filter((event) => event.calendar.id === dropdownFilter)
+      setFilteredEvents(filterCalendar)
+    }
+  }, [dropdownFilter])
 
   const events: AgendaItem[] = useMemo(
     () =>
@@ -43,13 +55,25 @@ const Agenda = (): ReactElement => {
           calendar.events.map((event) => ({ calendar, event })),
         )
         .sort(compareByDateTime),
-    [account.calendars],
+    [account],
   )
+  
   /**
-   * Bug fix: pass in a dependency to useMemo in order to trigger a re-render.
+   * Bug fix: Pass in a dependency to useMemo in order to trigger a re-render.
    *    Previously with no dependency, this variable 'title' only updated on mount
-   */
+   *    Utilizing the handy runEvery function to run a chron job to update the greeting
+   */ 
+  runEvery(FIVE_MIN_INTERVAL, setHour)
   const title = useMemo(() => greeting(DateTime.local().hour), [hour])
+
+  /**
+   * New feature: Filter agenda events by calendar
+   */
+  const handleEventFilter = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    console.log(e.target.value)
+    setDropdownFilter(e.target.value)
+  }
+
 
   return (
     <div className={style.outer}>
@@ -57,22 +81,38 @@ const Agenda = (): ReactElement => {
         <div className={style.header}>
           <span className={style.title}>{title}</span>
         </div>
-
+        <div className={style.controls}>
+          <div className={style.control}>
+            <label>Filter by Calendar</label>
+            <select
+              className={style.dropdown}
+              onChange={handleEventFilter}
+            >
+              <option value={null}></option>
+              {
+                calendars.map((id) => (
+                  <option key={id} value={id}>Calendar: {id}</option>
+                ))
+              }
+            </select>
+          </div>
+          {/* Note: Ran out of time to implement this toggle */}
+          <div className={style.control}>
+            <label>Group by Department</label>
+            <button onClick={()=> {}}>Group</button>
+          </div>
+        </div>
         <List>
           {
-            events.map(({ calendar, event }) => (
-              <EventCell key={event.id} calendar={calendar} event={event} />
-            ))
-          }
-          {/* {
-            account.errorMessage
-            ? <div className={style.error}>
-                <span className={style.title}>Whoops! Problem refreshing your account</span>
-              </div>
-            : events.map(({ calendar, event }) => (
+            !account.errorMessage && filteredEvents
+            ? filteredEvents.map(({ calendar, event }) => (
                 <EventCell key={event.id} calendar={calendar} event={event} />
               ))
-          } */}
+            : <div className={style.error}>
+                <p>Whoops!</p>
+                <p>Something went wrong fetching your calendars, we'll be right back...</p>
+              </div>
+          }
         </List>
       </div>
     </div>

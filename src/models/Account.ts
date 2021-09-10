@@ -2,7 +2,7 @@ import Calendar from './Calendar'
 
 type Account = {
   calendars: Calendar[]
-  // errorMessage?: string
+  errorMessage?: boolean
 }
 
 export default Account

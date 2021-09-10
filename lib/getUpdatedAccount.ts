@@ -55,6 +55,7 @@ const getUpdatedAccount = async (account: Account): Promise<Account> => {
     calendars: account.calendars.map((calendar, index) =>
       index !== randomCalendarIndex ? calendar : getUpdatedCalendar(calendar),
     ),
+    errorMessage: false
   }
 }
 
