@@ -43,7 +43,7 @@ const Agenda = (): ReactElement => {
           calendar.events.map((event) => ({ calendar, event })),
         )
         .sort(compareByDateTime),
-    [account],
+    [account.calendars],
   )
   /**
    * Bug fix: pass in a dependency to useMemo in order to trigger a re-render.
@@ -60,6 +60,11 @@ const Agenda = (): ReactElement => {
 
         <List>
           {
+            events.map(({ calendar, event }) => (
+              <EventCell key={event.id} calendar={calendar} event={event} />
+            ))
+          }
+          {/* {
             account.errorMessage
             ? <div className={style.error}>
                 <span className={style.title}>Whoops! Problem refreshing your account</span>
@@ -67,7 +72,7 @@ const Agenda = (): ReactElement => {
             : events.map(({ calendar, event }) => (
                 <EventCell key={event.id} calendar={calendar} event={event} />
               ))
-          }
+          } */}
         </List>
       </div>
     </div>
